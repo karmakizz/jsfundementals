@@ -105,7 +105,15 @@ const learnerSubmission = [
     } catch (error) {
       console.error(error.message)
     }
-  
+  // inputting other cod
+ let dueDates = learnerSubmissions.map((sub, index,) => { 
+    console.log(sub) 
+  })
+let sub ={
+     //passed a boolean if the student has a grade of 6 and above i want it to be true
+     //otherwise false 
+ passed: (learnerSubmissions.avg) >= 90? true:false}
+ 
     // here, we would process this data to achieve the desired result.
     const result = [
       {
