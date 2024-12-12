@@ -105,10 +105,14 @@ const learnerSubmission = [
     } catch (error) {
       console.error(error.message)
     }
-  // inputting other cod
- let dueDates = learnerSubmissions.map((sub, index,) => { 
-    console.log(sub) 
-  })
+  // inputting other code
+ const dueDates = assignmentGroup.assignments.map((assignment) => { 
+    const isPastDue = new Date(assignment.due_at) < new Date();
+    return{
+      assignmentId: assignment.Id,
+      isPastDue: isPastDue,
+    };
+  });
 let sub ={
      //passed a boolean if the student has a grade of 6 and above i want it to be true
      //otherwise false 
