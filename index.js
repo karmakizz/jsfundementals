@@ -106,19 +106,6 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
     console.error(error.message)
     return; // exit if there is an error
   }
-  const learnerAverages = {};
-  for (const submission of learnerSubmissions) {
-    // Accumulate scores and points
-    // Store averages in `learnerAverages`
-  }
-
-  function calculateScore(submission, assignment) {
-    const score = submission.submission.score || 0;
-    const points = assignment.points_possible || 1; // Avoid divide by zero
-    return (score / points) * 100; // Percentage
-  }
-
-  // inputting other codeto try and subtract points if assignment late
   const assignmentLookup = assignmentGroup.assignments.reduce((lookup, assignment) => {
     const isPastDue = new Date(assignment.due_at) < new Date();
     lookup[assignment.id] = { 
@@ -128,6 +115,30 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
     return lookup;
   }, {});
   
+  const learnerAverages = {};
+for (let submission of learnerSubmissions) {
+  const learnerId = submission.learner_id;
+  const assignmentId = submission.assignment_id;
+  const assignment = assignmentLookup[assignmentId];
+  const score = typeof submission.submission.score === "number" ? submission.submission.score : 0;
+  const isLate = assignment?.isPastDue || false;
+  const latePenalty = isLate ? 15 : 0;
+  const adjustedScore = Math.max(0, score - latePenalty);
+
+  if (!learnerAverages[learnerId]) {
+    learnerAverages[learnerId] = { totalScore: 0, totalPoints: 0, scores: {} };
+  }
+
+  learnerAverages[learnerId].totalScore += adjustedScore;
+  learnerAverages[learnerId].totalPoints += assignment?.points_possible || 0;
+  learnerAverages[learnerId].scores[assignmentId] = (adjustedScore / (assignment?.points_possible || 1)) * 100; // Percentage
+}
+
+  function calculateScore(submission, assignment) {
+    const score = submission.submission.score || 0;
+    const points = assignment.points_possible || 1; // Avoid divide by zero
+    return (score / points) * 100; // Percentage
+  }
   const learnerData = learnerSubmissions.map((submission) => {
     const score = typeof submission.submission.score === "number" ? submission.submission.score : 0;
     const isLate = assignmentLookup[submission.assignment_id]?.isPastDue || false; // Check late submission
@@ -142,7 +153,7 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
     };
   });
   
-  //passed a boolean if the student has a grade of 6 and above i want it to be true
+  //passed a boolean if the student has a grade of 90 and above i want it to be true
   //otherwise false 
   //passed: (learnerSubmissions.avg) >= 90? true:false}
 
@@ -168,7 +179,6 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
 }
 
 
+// Call the function
 const result = getLearnerData(courseInfo, assignmentGroup, learnerSubmission);
-
-
 console.log(result);
